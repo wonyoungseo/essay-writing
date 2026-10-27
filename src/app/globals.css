@@ -1,0 +1,165 @@
+@import "tailwindcss";
+@import "./themes.css";
+
+/* ------------------------------------------------------------------ */
+/* 디자인 토큰: 따뜻한 종이색 배경, 먹색 텍스트, 테라코타 강조색          */
+/* ------------------------------------------------------------------ */
+@theme {
+  --color-paper: #faf7f2;
+  --color-paper-deep: #f3ede3;
+  --color-surface: #fffdf9;
+  --color-ink: #2a2622;
+  --color-ink-soft: #4a433c;
+  --color-muted: #6e655c;
+  --color-line: #e6ddd0;
+  --color-line-strong: #d4c8b7;
+  --color-accent: #9a4a2c;
+  --color-accent-strong: #7d3a21;
+  --color-accent-soft: #f4e4da;
+  --color-mark: #f6e2a0;
+  --color-mark-strong: #efc860;
+  --color-danger: #a12a2a;
+  --color-danger-soft: #f8e3e1;
+  --color-success: #2f6b45;
+  --color-success-soft: #e2f0e6;
+  --color-warning: #6e5310;
+  --color-warning-soft: #fbf1d6;
+
+  --font-serif: var(--font-noto-serif-kr), "Apple SD Gothic Neo", serif;
+  --font-sans: var(--font-noto-sans-kr), system-ui, -apple-system, "Apple SD Gothic Neo", sans-serif;
+
+  --radius-card: 0.75rem;
+  --shadow-card: 0 1px 2px rgb(42 38 34 / 0.04), 0 1px 1px rgb(42 38 34 / 0.03);
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-paper);
+    min-height: 100dvh;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: var(--color-mark);
+    color: var(--color-ink);
+  }
+}
+
+/* 저장된 하이라이트 (CSS Custom Highlight API: DOM 을 수정하지 않고 칠한다) */
+::highlight(saved-highlight) {
+  background-color: var(--color-mark);
+  color: var(--color-ink);
+}
+::highlight(focus-highlight) {
+  background-color: var(--color-mark-strong);
+  color: var(--color-ink);
+}
+
+/* ------------------------------------------------------------------ */
+/* 본문 타이포그래피                                                   */
+/* ------------------------------------------------------------------ */
+.essay-body {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.95;
+  color: var(--color-ink);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 640px) {
+  .essay-body {
+    font-size: 1.125rem;
+  }
+}
+.essay-body > * + * {
+  margin-top: 1.4em;
+}
+/* 본문 문단은 태블릿(768px) 이상에서만 양쪽 정렬. 모바일은 단어 간격이 벌어져 왼쪽 정렬. 제목·코드·표는 제외. */
+@media (min-width: 768px) {
+  .essay-body p,
+  .essay-body li,
+  .essay-body blockquote {
+    text-align: justify;
+    text-justify: auto;
+  }
+}
+.essay-body h1,
+.essay-body h2,
+.essay-body h3,
+.essay-body h4 {
+  font-weight: 700;
+  line-height: 1.45;
+  margin-top: 2.2em;
+}
+.essay-body h1 { font-size: 1.5em; }
+.essay-body h2 { font-size: 1.3em; }
+.essay-body h3 { font-size: 1.12em; }
+.essay-body a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.essay-body blockquote {
+  border-left: 3px solid var(--color-line-strong);
+  padding-left: 1.1em;
+  color: var(--color-ink-soft);
+  font-style: italic;
+}
+.essay-body ul { list-style: disc; padding-left: 1.4em; }
+.essay-body ol { list-style: decimal; padding-left: 1.4em; }
+.essay-body li + li { margin-top: 0.4em; }
+.essay-body hr {
+  border: 0;
+  text-align: center;
+  margin: 2.5em 0;
+}
+.essay-body hr::after {
+  content: "· · ·";
+  color: var(--color-muted);
+  letter-spacing: 0.5em;
+}
+.essay-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.88em;
+  background: var(--color-paper-deep);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.essay-body pre {
+  background: var(--color-paper-deep);
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+.essay-body pre code { background: none; padding: 0; }
+.essay-body img { max-width: 100%; border-radius: 8px; }
+.essay-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92em;
+  font-family: var(--font-sans);
+}
+.essay-body th,
+.essay-body td {
+  border: 1px solid var(--color-line);
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

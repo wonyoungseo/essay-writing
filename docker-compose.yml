@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: essay
+      POSTGRES_PASSWORD: essay_local_password
+      POSTGRES_DB: essay
+    ports:
+      - "54329:5432"
+    volumes:
+      - essay-db:/var/lib/postgresql/data
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U essay -d essay"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  essay-db:

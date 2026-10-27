@@ -1,0 +1,15 @@
+node_modules
+.next
+out
+coverage
+.env*.local
+.env
+!.env.example
+*.tsbuildinfo
+next-env.d.ts
+test-results
+playwright-report
+.DS_Store
+tests/e2e/files/winter.docx
+
+./planning/*
