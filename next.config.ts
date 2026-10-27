@@ -1,0 +1,24 @@
+import type { NextConfig } from "next";
+
+const securityHeaders = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+];
+
+const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  serverExternalPackages: ["mammoth", "pg"],
+  experimental: {
+    serverActions: {
+      // 본문(Markdown) 최대 길이 200,000자 × UTF-8 3바이트 + 여유분
+      bodySizeLimit: "2mb",
+    },
+  },
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
+  },
+};
+
+export default nextConfig;

@@ -1,0 +1,38 @@
+# Pull Request 와 main 브랜치 push 마다 검사·테스트·빌드를 실행한다.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: essay
+          POSTGRES_PASSWORD: essay_ci_password
+          POSTGRES_DB: essay_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U essay -d essay_test"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgres://essay:essay_ci_password@localhost:5432/essay_ci_unused
+      DATABASE_URL_TEST: postgres://essay:essay_ci_password@localhost:5432/essay_test
+      BETTER_AUTH_SECRET: ci-only-secret-ci-only-secret-ci-only-1234
+      BETTER_AUTH_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build

@@ -1,0 +1,10 @@
+# Vercel CLI 로 업로드할 때 제외할 파일 (비밀 값, 빌드 결과물, 테스트 산출물)
+.env*
+!.env.example
+node_modules
+.next
+coverage
+test-results
+playwright-report
+tests/e2e/files/winter.docx
+planning
