@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/ui/feedback";
 import { Select } from "@/components/ui/field";
 import { Pagination } from "@/components/ui/pagination";
 import { TagLink } from "@/components/ui/tag";
-import { getViewer } from "@/lib/auth/session";
+import { requireViewerOrRedirect } from "@/lib/auth/session";
 import { searchParamsSchema, type SearchParams } from "@/lib/validation";
 import { listPopularTags, searchPosts } from "@/features/posts/service";
 
@@ -31,7 +31,8 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
   const raw = await searchParams;
   const flat = Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, Array.isArray(v) ? v[0] : v]));
   const params = searchParamsSchema.parse(flat);
-  const viewer = await getViewer();
+  // 탐색은 로그인한 사용자만. 로그인 후 같은 검색 조건으로 돌아온다.
+  const viewer = await requireViewerOrRedirect(buildHref(params, {}));
   const [result, tags] = await Promise.all([searchPosts(viewer, params), listPopularTags(20)]);
   const activeTag = tags.find((t) => t.slug === params.tag);
   const hasFilter = !!(params.q || params.tag || params.scope === "mine");

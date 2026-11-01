@@ -141,6 +141,14 @@ test("라이트/다크 테마를 전환하면 새로고침 후에도 유지된�
 });
 
 test("비로그인 사용자는 읽기만 가능하고 쓰기 페이지는 로그인으로 이동한다", async ({ page }) => {
+  // 홈에는 글 목록 대신 로그인 안내만 보인다
+  await page.goto("/");
+  await expect(page.getByText("로그인하면 올라온 글을 볼 수 있어요.")).toBeVisible();
+  await expect(page.locator('a[href^="/posts/"]')).toHaveCount(0);
+  await expect(page.getByRole("navigation", { name: "주요 메뉴" }).getByRole("link", { name: "탐색" })).toHaveCount(0);
+  // 탐색 페이지는 로그인 페이지로 보내고, 검색 조건을 유지한다
+  await page.goto("/explore?q=" + encodeURIComponent("서점"));
+  await expect(page).toHaveURL(/\/login\?next=%2Fexplore%3Fq%3D/);
   await page.goto(postUrl);
   await expect(page.getByRole("link", { name: "로그인", exact: true }).first()).toBeVisible();
   await expect(page.getByRole("textbox", { name: "감상과 피드백" })).toHaveCount(0);

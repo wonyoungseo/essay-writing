@@ -26,11 +26,11 @@ export async function SiteHeader() {
 
         <nav aria-label="주요 메뉴" className="hidden items-center gap-1 md:flex">
           <ThemeToggle current={theme} className="size-9 justify-center rounded-full text-ink-soft hover:bg-paper-deep hover:text-ink" />
-          <Link href="/explore" className={navLink}>
-            탐색
-          </Link>
           {viewer ? (
             <>
+              <Link href="/explore" className={navLink}>
+                탐색
+              </Link>
               <Link href="/my/highlights" className={navLink}>
                 하이라이트
               </Link>
@@ -80,11 +80,11 @@ export async function SiteHeader() {
               메뉴{unread > 0 && <span className="ml-1 size-2 rounded-full bg-accent" aria-label="읽지 않은 알림 있음" />}
             </summary>
             <nav aria-label="모바일 메뉴" className="absolute right-0 mt-2 w-56 rounded-lg border border-line bg-surface p-1.5 shadow-lg">
-              <Link href="/explore" className="block rounded-md px-3 py-2.5 text-sm hover:bg-paper-deep">
-                탐색
-              </Link>
               {viewer ? (
                 <>
+                  <Link href="/explore" className="block rounded-md px-3 py-2.5 text-sm hover:bg-paper-deep">
+                    탐색
+                  </Link>
                   <Link href="/upload" className="block rounded-md px-3 py-2.5 text-sm font-medium text-accent hover:bg-paper-deep">
                     글 올리기
                   </Link>
