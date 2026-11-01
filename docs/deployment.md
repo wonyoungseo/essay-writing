@@ -6,7 +6,7 @@
 
 | 항목 | 값 |
 |---|---|
-| 서비스 주소 | https://essay-writing-eta.vercel.app |
+| 서비스 주소 | https://essay-writing-group.vercel.app |
 | 호스팅 | Vercel, 팀 `essay-writing`(Hobby), 프로젝트 `essay-writing`, 앱 서버 리전 `sin1`(싱가포르, `vercel.json`) |
 | 데이터베이스 | Neon PostgreSQL `essay-writing-db` (Vercel Marketplace 연동, Free 플랜, 싱가포르). **Production 환경에만 연결** |
 | 코드 | GitHub `wonyoungseo/essay-writing` (비공개). `main` 에 push 하면 운영 자동 배포, 다른 브랜치는 미리보기 배포 |
@@ -21,7 +21,7 @@ npx -y vercel@63.1.2 login                                   # 최초 1회
 npx -y vercel@63.1.2 link --project essay-writing --scope essay-writing --yes
 npx -y vercel@63.1.2 env ls --scope essay-writing            # 환경 변수 목록
 npx -y vercel@63.1.2 deploy --prod --scope essay-writing     # 로컬에서 운영 배포 (보통은 main push 로 충분)
-npx -y vercel@63.1.2 logs essay-writing-eta.vercel.app       # 운영 로그
+npx -y vercel@63.1.2 logs essay-writing-group.vercel.app       # 운영 로그
 ```
 
 > ⚠ `vercel env pull` 은 파일 이름을 생략하면 **로컬 `.env.local` 을 덮어씁니다.** 항상 `vercel env pull /tmp/prod.env --environment production` 처럼 다른 파일을 지정하고, 다 쓴 뒤 지우세요.
