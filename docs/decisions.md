@@ -49,6 +49,7 @@
 - 모든 색·본문 글꼴을 디자인 토큰(CSS 변수)으로 두고 `<html data-theme>` 로 묶음 전체를 교체한다.
 - 후보 4종(따뜻한 종이, 먹과 여백, 숲길, 밤의 서재)을 비교한 뒤, 2026-10-27 요청에 따라 라이트=먹과 여백, 다크=밤의 서재 두 가지를 사용자가 헤더에서 전환하도록 했다. 선택은 쿠키에 저장해 서버 렌더링 시점부터 깜빡임 없이 적용된다. 자세한 내용은 docs/theming.md.
 
-### D-15. 배포 대상 추천: Railway (앱 + PostgreSQL)
-- 현재 구조(상시 실행 Node 서버, pg 커넥션 풀, 메모리 rate limit, 5MB 업로드)를 코드 변경 없이 운영할 수 있고, 관리 화면이 하나라서 운영 경험이 적은 팀에 맞다. Vercel + Neon 은 대안 (docs/deployment.md 6장).
-- `tsx`, `dotenv` 를 dependencies 로 옮겨 배포 서버에서도 `db:migrate`, `admin:create` 를 실행할 수 있게 했다.
+### D-15. 배포: Vercel + Neon
+- 처음에는 코드 변경 없이 운영 가능한 Railway 를 추천했으나, 2026-11-01 시점 Railway 신규 가입이 막혀 Vercel + Neon 으로 배포했다.
+- 서버리스 환경에 맞춰 업로드 한도 4MB, 작은 커넥션 풀, 운영 빌드 시 마이그레이션, Vercel 주소 자동 신뢰를 적용했다. Neon 은 운영 환경에만 연결해 미리보기 배포가 운영 DB 를 쓰지 않게 했다. 자세한 내용은 docs/deployment.md.
+- `tsx`, `dotenv` 를 dependencies 로 옮겨 배포 빌드에서도 `db:migrate` 를 실행할 수 있게 했다.

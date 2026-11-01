@@ -13,3 +13,6 @@ playwright-report
 tests/e2e/files/winter.docx
 
 ./planning/*
+.vercel
+.env*
+!.env.example

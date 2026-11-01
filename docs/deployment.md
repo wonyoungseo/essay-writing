@@ -2,6 +2,46 @@
 
 이 문서는 웹 서비스 배포를 처음 해 보는 분을 기준으로 씁니다. 사용자 5~10명, 개발자 2~3명 규모를 가정합니다.
 
+## 현재 운영 환경 (2026-11-01 배포)
+
+| 항목 | 값 |
+|---|---|
+| 서비스 주소 | https://essay-writing-eta.vercel.app |
+| 호스팅 | Vercel, 팀 `essay-writing`(Hobby), 프로젝트 `essay-writing`, 앱 서버 리전 `sin1`(싱가포르, `vercel.json`) |
+| 데이터베이스 | Neon PostgreSQL `essay-writing-db` (Vercel Marketplace 연동, Free 플랜, 싱가포르). **Production 환경에만 연결** |
+| 코드 | GitHub `wonyoungseo/essay-writing` (비공개). `main` 에 push 하면 운영 자동 배포, 다른 브랜치는 미리보기 배포 |
+| 환경 변수 (Vercel) | `DATABASE_URL`, `DATABASE_URL_UNPOOLED` 등은 Neon 연동이 자동 등록. `BETTER_AUTH_SECRET` 은 Sensitive 로 등록 |
+| 마이그레이션 | 운영 빌드 때 `vercel-build` 스크립트가 `npm run db:migrate` 를 먼저 실행 (미리보기 빌드는 건너뜀) |
+| 관리자 | `admin@essaywriting.com` (첫 로그인 후 비밀번호 변경 권장) |
+
+### 자주 쓰는 명령
+
+```bash
+npx -y vercel@63.1.2 login                                   # 최초 1회
+npx -y vercel@63.1.2 link --project essay-writing --scope essay-writing --yes
+npx -y vercel@63.1.2 env ls --scope essay-writing            # 환경 변수 목록
+npx -y vercel@63.1.2 deploy --prod --scope essay-writing     # 로컬에서 운영 배포 (보통은 main push 로 충분)
+npx -y vercel@63.1.2 logs essay-writing-eta.vercel.app       # 운영 로그
+```
+
+> ⚠ `vercel env pull` 은 파일 이름을 생략하면 **로컬 `.env.local` 을 덮어씁니다.** 항상 `vercel env pull /tmp/prod.env --environment production` 처럼 다른 파일을 지정하고, 다 쓴 뒤 지우세요.
+
+### 운영 관리자 추가 생성 (로컬에서)
+
+```bash
+npx -y vercel@63.1.2 env pull /tmp/prod.env --environment production --scope essay-writing
+( set -a; . /tmp/prod.env; set +a; npm run admin:create -- 이메일 '비밀번호' 이름 )
+rm /tmp/prod.env
+```
+보통은 운영 사이트의 **관리자 → 계정 발급** 화면에서 만들면 됩니다.
+
+### 미리보기(Preview) 배포 주의
+Neon 은 Production 에만 연결돼 있어, 미리보기 배포에는 DB 주소가 없습니다(화면은 뜨지만 데이터 기능은 동작하지 않음). 미리보기에서도 DB 가 필요해지면 Neon 의 브랜치 기능으로 별도 DB 를 연결하세요. 운영 DB 를 미리보기에 그대로 연결하지 마세요.
+
+---
+
+아래는 배포 개념과 다른 선택지에 대한 일반 안내입니다.
+
 ## 0. 큰 그림: 배포에 필요한 것 4가지
 
 | 필요한 것 | 무엇인가 | 이 프로젝트에서 |
@@ -28,13 +68,13 @@
 
 | 선택지 | 장점 | 주의할 점 | 적합한 경우 |
 |---|---|---|---|
-| **A. Railway (추천)** | 앱과 DB 를 한 화면에서 관리. 현재 코드를 고치지 않고 그대로 실행됨. GitHub 연동 자동 배포 | 사용량 기반 유료 (소규모는 월 수 달러 수준이지만 가입 시 요금표 확인) | 서버 운영 경험이 없고, 관리 포인트를 최소화하고 싶을 때 |
-| B. Vercel + Neon(DB) | Next.js 를 만든 회사의 호스팅. PR 마다 미리보기 주소가 자동 생성되어 협업에 좋음. 무료 플랜으로 시작 가능 | 서비스 2곳을 관리해야 함. 요청 본문이 약 4.5MB 로 제한되어 **업로드 최대 크기(현재 5MB)를 4MB 로 낮춰야 함**. 메모리 기반 요청 제한이 인스턴스마다 따로 동작 | 무료로 시작하고 싶고 PR 미리보기가 중요할 때 |
+| A. Railway | 앱과 DB 를 한 화면에서 관리. 현재 코드를 고치지 않고 그대로 실행됨. GitHub 연동 자동 배포 | 사용량 기반 유료 (소규모는 월 수 달러 수준이지만 가입 시 요금표 확인) | 서버 운영 경험이 없고, 관리 포인트를 최소화하고 싶을 때 |
+| **B. Vercel + Neon(DB) — 채택** | Next.js 를 만든 회사의 호스팅. PR 마다 미리보기 주소가 자동 생성되어 협업에 좋음. 무료 플랜으로 시작 가능 | 서비스 2곳을 관리해야 함. 요청 본문이 약 4.5MB 로 제한되어 **업로드 최대 크기(현재 5MB)를 4MB 로 낮춰야 함**. 메모리 기반 요청 제한이 인스턴스마다 따로 동작 | 무료로 시작하고 싶고 PR 미리보기가 중요할 때 |
 | C. 회사 클라우드/서버 (AWS 등) | 회사 보안 정책과 맞추기 쉬움 | 서버·네트워크 설정을 직접 해야 함 | 사내 인프라 담당자가 있을 때 |
 
 > **회사 서비스로 운영한다면** 외부 클라우드 사용과 회사 도메인 사용이 사내 정책상 괜찮은지 IT/보안 담당자에게 먼저 확인하세요. 이 서비스에는 이메일과 글 내용이 저장됩니다.
 
-아래는 **A. Railway** 기준입니다. B 를 고르면 6장을 참고하세요.
+Railway 는 2026-11-01 시점 신규 가입이 막혀 있어 **B. Vercel + Neon 을 채택**했습니다. 아래 3장(Railway)은 참고용으로 남겨 둡니다.
 
 ## 2. 사전 준비 (최초 1회)
 
@@ -133,11 +173,13 @@ openssl rand -base64 32
 ### 운영 환경을 하나 더 둘지 (스테이징)
 5~10명 규모에서는 처음엔 운영 환경 하나로 충분합니다. 큰 변경을 미리 확인하고 싶어지면 Railway 에서 환경(Environment)을 하나 더 만들어 `staging` 브랜치를 연결합니다.
 
-## 6. Vercel + Neon 을 고른 경우 차이점
+## 6. Vercel + Neon 에 맞춰 코드에서 바꾼 것
 
-- Neon 에서 DB 를 만들고, **pooled 연결 문자열**을 `DATABASE_URL` 로 씁니다.
-- [src/lib/content/file-validation.ts](../src/lib/content/file-validation.ts) 의 `MAX_UPLOAD_BYTES` 를 `4 * 1024 * 1024` 로 낮춥니다 (Vercel 요청 크기 제한).
-- 마이그레이션은 배포 전에 로컬에서 `DATABASE_URL=<Neon 주소> npm run db:migrate` 로 실행하거나, Vercel Build Command 를 `npm run db:migrate && npm run build` 로 바꿉니다.
+- 업로드 최대 크기 4MB (`MAX_UPLOAD_BYTES`, Vercel 요청 본문 한도 약 4.5MB)
+- DB 커넥션 풀: Vercel 에서는 인스턴스당 최대 3개, 유휴 연결 5초 후 종료 (`src/lib/db/index.ts`). `DATABASE_URL` 은 Neon pooled 주소
+- 마이그레이션: `vercel-build` 스크립트, `DATABASE_URL_UNPOOLED` 우선 사용, 미리보기 빌드는 건너뜀 (`scripts/migrate.ts`)
+- 로그인 주소: `BETTER_AUTH_URL` 이 없으면 Vercel 이 주는 운영/브랜치 주소를 자동 신뢰 (`src/lib/auth/auth.ts`). **별도 도메인을 연결하면 `BETTER_AUTH_URL` 을 그 주소로 등록**
+- `vercel.json`: `framework: nextjs`, `regions: ["sin1"]` (DB 와 같은 리전)
 - 요청 제한(rate limit)은 서버 인스턴스마다 따로 동작합니다. 소규모에서는 문제없습니다.
 
 ## 7. 운영 체크리스트
